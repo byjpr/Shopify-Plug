@@ -20,7 +20,6 @@ defmodule ShopifyPlug.Mixfile do
 
   defp description do
     """
-    A plug building toolkit for blocking and throttling abusive requests.
     A plug for verifying webhooks are truely from Shopify
     """
   end
