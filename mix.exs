@@ -25,7 +25,12 @@ defmodule ShopifyPlug.Mixfile do
   end
 
   defp deps do
-    [{:plug, "~> 1.0"}, {:secure_compare, "~> 0.1.0"}, {:ex_doc, "~> 0.19", only: :dev}]
+    [
+      {:plug, "~> 1.0"},
+      {:secure_compare, "~> 0.1.0"},
+      {:phoenix, "~> 1.3", only: [:dev, :test]},
+      {:ex_doc, "~> 0.19", only: :dev}
+    ]
   end
 
   defp package do
