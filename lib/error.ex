@@ -14,8 +14,7 @@ defmodule ShopifyPlug.Errors do
 
   defp allow_action(conn, who) do
     Logger.warn(fn ->
-      "#{who}: " <>
-        "[ShopifyPlug]: Failed. " <>
+        "[ShopifyPlug##{who}: ]: Failed. " <>
         "Doing this from a production enviroment will fail with the error code 400."
     end)
 
@@ -24,7 +23,7 @@ defmodule ShopifyPlug.Errors do
 
   def block_action(conn, who) do
     Logger.warn(fn ->
-      "#{who}: [ShopifyPlug]: Failed. Connection refused, sent error 400."
+      "[ShopifyPlug##{who}]: Failed. Connection refused, sent error 400."
     end)
 
     conn
