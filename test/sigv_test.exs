@@ -1,6 +1,6 @@
-defmodule ShopifyPlug.ParamvTest do
+defmodule ShopifyPlug.SigvTest do
   use ExUnit.Case
-  use Plug.Test
+  use Phoenix.ConnTest
 
   @secret "hush"
   @query "extra=1&" <>
@@ -24,20 +24,20 @@ defmodule ShopifyPlug.ParamvTest do
   defp make_request(%{url: url, query: query, secret: secret}) do
     endpoint = url <> "?" <> query
 
-    conn(:post, endpoint, "")
+    build_conn(:post, endpoint, "")
     |> ShopifyPlug.Sigv.call(secret: secret)
   end
 
   @tag :urlencoded_valid_request
   test "urlencoded request with valid hmac" do
-    %{url: "/", query: @query, secret: @secret}
+    %{url: "/sigv", query: @query, secret: @secret}
     |> make_request()
     |> assert_authorized()
   end
 
   @tag :urlencoded_valid_request
   test "urlencoded request with invalid hmac" do
-    %{url: "/", query: @query, secret: "1234"}
+    %{url: "/sigv", query: @query, secret: "1234"}
     |> make_request()
     |> assert_unauthorized()
   end
