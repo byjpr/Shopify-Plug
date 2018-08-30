@@ -20,7 +20,6 @@ defmodule ShopifyPlug.Sigv do
   """
 
   @behaviour Plug
-  use Plug.ErrorHandler
 
   def init(), do: raise(ArgumentError, message: "missing require options")
 
@@ -32,14 +31,12 @@ defmodule ShopifyPlug.Sigv do
   end
 
   @doc """
-    Knowing that all requests will come with a signature from Shopify. Generated with our Shared Secret and the `params`.
-    If we compute a version of the request signature and it matches the one Shopify sent us, it must be Shopify. (or a hax0r).
+  Check that all the parameters we need are set in the connection.
   """
-  def call(conn, opts) do
+  def call(%Plug.Conn{ params: %{ "signature" => signature } } = conn, opts) do
     fetched = Plug.Conn.fetch_query_params(conn)
 
     %Plug.Conn{params: params} = fetched
-    %{"signature" => signature} = params
 
     calculated_signature =
       fetched.query_string
@@ -47,7 +44,7 @@ defmodule ShopifyPlug.Sigv do
       |> Enum.sort()
       |> Enum.map(fn {k, v} -> stringify(k, v) end)
       |> Enum.join("")
-      |> hash(opts)
+      |> generate_hmac(opts)
       |> Base.encode16()
       |> String.downcase()
 
@@ -63,24 +60,25 @@ defmodule ShopifyPlug.Sigv do
   @doc """
     hash/1 proxies to :crypto.hmac/3
   """
-  def hash(query_hash, opts), do: :crypto.hmac(:sha256, opts[:secret], query_hash)
+  def generate_hmac(query_hash, opts), do: :crypto.hmac(:sha256, opts[:signature], query_hash)
 
   def create_param_object(params) do
-    # Split on the & Char
-    # Split each on the = char
-    # Make `v` URI decoded
-    # Create list of k,v
-    # Group same keys
-    # pop the signature
-
     params
-    |> String.split("&")
-    |> Enum.map(fn v -> String.split(v, "=") end)
-    |> Enum.map(fn [k, v] -> [k, URI.decode(v)] end)
-    |> Enum.flat_map(fn [k, v] -> ["#{k}": v] end)
-    |> Enum.group_by(fn {k, _} -> k end, fn {_, v} -> v end)
-    |> Map.delete(:signature)
+    |> split_query_strings()
+    |> split_query_key_string()
+    |> decode_query_string()
+    |> list_of_kv_pair()
+    |> group_by_unique_key()
+    |> remove_signature()
   end
+
+  defp split_query_strings(string), do: String.split(string, "&")
+  defp split_query_key_string(value), do: Enum.map(value, fn v -> String.split(v, "=") end)
+  defp decode_query_string(value), do: Enum.map(value, fn [k, v] -> [k, URI.decode(v)] end)
+
+  defp list_of_kv_pair(value), do: Enum.flat_map(value, fn [k, v] -> ["#{k}": v] end)
+  defp group_by_unique_key(value), do: Enum.group_by(value, fn {k, _} -> k end, fn {_, v} -> v end)
+  defp remove_signature(value), do: Map.delete(value, :signature)
 
   defp stringify(key, value) when is_list(value) or is_map(value) do
     csv = Enum.join(value, ",")
