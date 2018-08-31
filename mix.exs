@@ -15,7 +15,7 @@ defmodule ShopifyPlug.Mixfile do
   end
 
   def application do
-    [applications: [:logger]]
+    [extra_applications: [:logger, :plug]]
   end
 
   defp description do
