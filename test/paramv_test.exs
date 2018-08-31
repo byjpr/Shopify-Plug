@@ -31,5 +31,15 @@ defmodule ShopifyPlug.ParamvTest do
       |> ShopifyPlug.Paramv.call([])
       |> assert_unauthorized()
     end
+
+    test "No init options" do
+      init = ShopifyPlug.Paramv.init()
+      assert init == []
+    end
+
+    test "init options" do
+      init = ShopifyPlug.Paramv.init([sample: "options"])
+      assert init == [sample: "options"]
+    end
   end
 end
