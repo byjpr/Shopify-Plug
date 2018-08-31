@@ -1,0 +1,13 @@
+language: elixir
+elixir:
+  - 1.6.6
+otp_release:
+  - 21.0
+env:
+  - MIX_ENV=test
+script:
+  - "mix do deps.get, test && mix compile && mix coveralls.travis"
+cache:
+  directories:
+    - _build
+    - deps

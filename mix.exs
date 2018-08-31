@@ -8,6 +8,8 @@ defmodule ShopifyPlug.Mixfile do
       elixir: "~> 1.4",
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
+      test_coverage: [tool: ExCoveralls],
+      preferred_cli_env: [coveralls: :test],
       description: description(),
       package: package(),
       deps: deps()
@@ -29,6 +31,7 @@ defmodule ShopifyPlug.Mixfile do
       {:plug, "~> 1.0"},
       {:secure_compare, "~> 0.1.0"},
       {:phoenix, "~> 1.3", only: [:dev, :test]},
+      {:excoveralls, "~> 0.9", only: :test},
       {:ex_doc, "~> 0.19", only: :dev}
     ]
   end
