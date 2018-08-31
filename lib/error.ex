@@ -2,7 +2,7 @@ defmodule ShopifyPlug.Errors do
   require Logger
 
   def failed_connection(conn, who) do
-    case Application.get_env(:map_rewire, :rule) do
+    case Application.get_env(:shopify_plug, :rule) do
       # We allow dev enviorment failing silently
       :allow ->
         allow_action(conn, who)
