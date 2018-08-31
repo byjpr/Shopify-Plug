@@ -19,12 +19,13 @@ defmodule ShopifyPlug.Paramv do
         _default
       ) do
     conn
+    |> Plug.Conn.put_req_header("x-spap-paramv", "pass")
   end
 
   @doc """
   If the parameters are not set we'll render an error and halt the pipeline
   """
   def call(conn, _default) do
-    ShopifyPlug.Errors.failed_connection(conn, :Paramv)
+    ShopifyPlug.Errors.failed_connection(conn, :paramv)
   end
 end

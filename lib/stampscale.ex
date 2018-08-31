@@ -6,10 +6,11 @@ defmodule ShopifyPlug.StampScale do
 
   def call(diff, %Plug.Conn{} = conn) when diff < 30 do
     conn
+    |> Plug.Conn.put_req_header("x-spap-stampscale", "pass")
   end
 
   def call(diff, %Plug.Conn{} = conn) when diff > 30 do
-    ShopifyPlug.Errors.failed_connection(conn, :StampScale)
+    ShopifyPlug.Errors.failed_connection(conn, :stampscale)
   end
 
   def call(%Plug.Conn{params: %{"timestamp" => timestamp}} = conn, _default) do
@@ -21,10 +22,10 @@ defmodule ShopifyPlug.StampScale do
   end
 
   def call(conn, _default) do
-    ShopifyPlug.Errors.failed_connection(conn, :StampScale)
+    ShopifyPlug.Errors.failed_connection(conn, :stampscale)
   end
 
   def call(conn) do
-    ShopifyPlug.Errors.failed_connection(conn, :StampScale)
+    ShopifyPlug.Errors.failed_connection(conn, :stampscale)
   end
 end

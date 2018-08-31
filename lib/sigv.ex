@@ -51,9 +51,10 @@ defmodule ShopifyPlug.Sigv do
     case SecureCompare.compare(signature, calculated_signature) do
       true ->
         conn
+        |> Plug.Conn.put_req_header("x-spap-sigv", "pass")
 
       false ->
-        ShopifyPlug.Errors.failed_connection(conn, :Sigv)
+        ShopifyPlug.Errors.failed_connection(conn, :sigv)
     end
   end
 
