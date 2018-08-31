@@ -1,5 +1,6 @@
 defmodule ShopifyPlug.SigvTest do
   use ExUnit.Case
+  import ExUnit.Assertions
   import PlugHelper
 
   test "Correct signature" do
@@ -16,5 +17,22 @@ defmodule ShopifyPlug.SigvTest do
     |> fetch_all()
     |> ShopifyPlug.Sigv.call([signature: "hush"])
     |> assert_unauthorized()
+  end
+
+  test "No init options" do
+    assert_raise(ArgumentError, "missing require options", fn ->
+       ShopifyPlug.Sigv.init()
+    end)
+  end
+
+  test "bad init options" do
+    assert_raise(ArgumentError, "missing require argument 'signature'", fn ->
+       ShopifyPlug.Sigv.init([input: "hush"])
+    end)
+  end
+
+  test "good init options" do
+    init = ShopifyPlug.Sigv.init([signature: "hush"])
+    assert init == [signature: "hush"]
   end
 end
