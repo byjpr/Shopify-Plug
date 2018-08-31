@@ -33,20 +33,9 @@ defmodule ShopifyPlug.Sigv do
   @doc """
   Check that all the parameters we need are set in the connection.
   """
-  def call(%Plug.Conn{ params: %{ "signature" => signature } } = conn, opts) do
-    fetched = Plug.Conn.fetch_query_params(conn)
-
-    %Plug.Conn{params: params} = fetched
-
+  def call(%Plug.Conn{ params: %{ "signature" => signature }, query_string: query_string } = conn, opts) do
     calculated_signature =
-      fetched.query_string
-      |> create_param_object()
-      |> Enum.sort()
-      |> Enum.map(fn {k, v} -> stringify(k, v) end)
-      |> Enum.join("")
-      |> generate_hmac(opts)
-      |> Base.encode16()
-      |> String.downcase()
+      create_calculated_signature(query_string, opts)
 
     case SecureCompare.compare(signature, calculated_signature) do
       true ->
@@ -63,14 +52,25 @@ defmodule ShopifyPlug.Sigv do
   """
   def generate_hmac(query_hash, opts), do: :crypto.hmac(:sha256, opts[:signature], query_hash)
 
-  def create_param_object(params) do
+  def create_calculated_signature(params, opts) do
+    params
+    |> parse_query()
+    |> remove_signature()
+    |> Enum.sort()
+    |> Enum.map(fn {k, v} -> stringify(k, v) end)
+    |> Enum.join("")
+    |> generate_hmac(opts)
+    |> Base.encode16()
+    |> String.downcase()
+  end
+
+  def parse_query(params) do
     params
     |> split_query_strings()
     |> split_query_key_string()
     |> decode_query_string()
     |> list_of_kv_pair()
     |> group_by_unique_key()
-    |> remove_signature()
   end
 
   defp split_query_strings(string), do: String.split(string, "&")
