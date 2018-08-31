@@ -43,4 +43,15 @@ defmodule ShopifyPlug.StampscaleTest do
     init = ShopifyPlug.StampScale.init([sample: "options"])
     assert init == [sample: "options"]
   end
+
+  test "Time now" do
+    timestamp = DateTime.utc_now()
+    |> DateTime.to_unix(:millisecond)
+
+    %{url: "/stampscale", query: "extra=1&extra=2&shop=shop-name.myshopify.com&path_prefix=%2Fapps%2Fawesome_reviews&timestamp=#{timestamp}&signature=a9718877bea71c2484f91608a7eaea1532bdf71f5c56825065fa4ccabe549ef3"}
+    |> make_request()
+    |> fetch_all()
+    |> ShopifyPlug.StampScale.call([])
+    |> assert_authorized()
+  end
 end
