@@ -6,7 +6,7 @@ otp_release:
 env:
   - MIX_ENV=test
 script:
-  - "mix do deps.get, test && mix compile"
+  - "mix do deps.get, test && mix compile && mix coveralls.travis"
 cache:
   directories:
     - _build
