@@ -19,6 +19,7 @@ defmodule ShopifyPlug.Errors do
     end)
 
     conn
+    |> Plug.Conn.put_resp_header("x-spap-#{who}", "softfail")
   end
 
   def block_action(conn, who) do
@@ -27,6 +28,7 @@ defmodule ShopifyPlug.Errors do
     end)
 
     conn
+    |> Plug.Conn.put_resp_header("x-spap-#{who}", "fail")
     |> Plug.Conn.send_resp(400, "Bad Request\n")
     |> Plug.Conn.halt()
   end
